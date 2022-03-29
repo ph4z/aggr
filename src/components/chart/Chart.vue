@@ -92,7 +92,7 @@ import { Component, Mixins } from 'vue-property-decorator'
 
 import ChartController, { TimeRange } from './chart'
 
-import { getHms, formatBytes, openBase64InNewTab, getTimeframeForHuman, floorTimestampToTimeframe } from '@/utils/helpers'
+import { formatBytes, openBase64InNewTab, getTimeframeForHuman, floorTimestampToTimeframe } from '@/utils/helpers'
 import { formatPrice, formatAmount } from '@/services/productsService'
 import { defaultChartOptions, getChartCustomColorsOptions } from './options'
 
@@ -1124,15 +1124,7 @@ export default class extends Mixins(PaneMixin) {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
 
-    let timeframe = this.$store.state[this.paneId].timeframe as any
-
-    if (!isNaN(+timeframe)) {
-      timeframe = getHms(timeframe * 1000).toUpperCase()
-    } else {
-      timeframe = parseInt(timeframe) + ' TICKS'
-    }
-
-    const text = timeframe
+    const text = this.timeframeForHuman
 
     const zoom = this.$store.state.panes.panes[this.paneId].zoom || 1
 
@@ -1145,8 +1137,8 @@ export default class extends Mixins(PaneMixin) {
 
     const words = text.split(' ')
     const lines = []
-    const date = new Date().toISOString()
-    const dateWidth = ctx.measureText(date).width
+    const dateString = new Date().toUTCString()
+    const dateWidth = ctx.measureText(dateString).width
 
     let currentLine = ' |'
 
@@ -1162,10 +1154,9 @@ export default class extends Mixins(PaneMixin) {
     }
 
     lines.push(currentLine)
-    lines.push(this._chartController.watermark + ' (' + this.markets.length + ' market' + (this.markets.length ? 's' : '') + ')')
+    lines.push(this._chartController.watermark + (this.visibleMarkets > 1 ? ' (' + this.visibleMarkets + ' markets)' : ''))
 
     const lineHeight = Math.round(textPadding)
-    const headerHeight = Math.round(textPadding * 2 + lines.length * lineHeight)
     canvas.height = chartCanvas.height
 
     const backgroundColor = this.$store.state.settings.backgroundColor
@@ -1183,24 +1174,30 @@ export default class extends Mixins(PaneMixin) {
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
 
+    let offsetY = textPadding + lineHeight * lines.length
+
     for (let i = 0; i < lines.length; i++) {
-      let offset = 0
+      let offsetX = 0
 
       if (i === 0) {
         ctx.fillStyle = color100
-        ctx.fillText(date, textPadding, textPadding)
-        offset = dateWidth
+        ctx.fillText(dateString, textPadding, textPadding)
+        offsetX = dateWidth
         ctx.fillStyle = color100
       }
 
-      ctx.fillText(lines[i], offset + textPadding, textPadding + lineHeight * i)
+      ctx.fillText(lines[i], offsetX + textPadding, textPadding + offsetY)
+
+      offsetY += lineHeight * i
     }
 
     const luminance = getColorLuminance(splitRgba(backgroundColor))
     const textColor = luminance < 170 ? '#ffffff' : '#000000'
 
     if (this.showIndicatorsOverlay) {
-      Object.values(this.indicators).forEach((indicator, index) => {
+      offsetY += textPadding
+
+      Object.values(this.indicators).forEach(indicator => {
         const options = indicator.options as any
 
         if (options.visible === false) {
@@ -1222,7 +1219,9 @@ export default class extends Mixins(PaneMixin) {
         }
 
         ctx.fillStyle = color
-        ctx.fillText(indicator.displayName || indicator.name, textPadding, headerHeight + textPadding + index * lineHeight * 1.2)
+        ctx.fillText(indicator.displayName || indicator.name, textPadding, offsetY)
+
+        offsetY += lineHeight * 1.2
       })
     }
 
