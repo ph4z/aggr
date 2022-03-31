@@ -16,6 +16,7 @@
   >
     <Notices />
     <div class="app__wrapper">
+      <IMenu />
       <Menu />
 
       <div class="app__layout">
@@ -51,6 +52,7 @@ import aggregatorService from './services/aggregatorService'
 
 import Notices from '@/components/framework/Notices.vue'
 import Menu from '@/components/Menu.vue'
+import IMenu from '@/components/IMenu.vue'
 
 import Panes from '@/components/panes/Panes.vue'
 
@@ -68,6 +70,7 @@ import importService from '@/services/importService'
   name: 'App',
   components: {
     Menu,
+    IMenu,
     Notices,
     Panes
   },
