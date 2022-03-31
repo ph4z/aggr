@@ -18,7 +18,6 @@ module.exports = {
       "error",
       {
         "endOfLine": "auto",
-        "useTabs": "false"
       }
     ]    
   }

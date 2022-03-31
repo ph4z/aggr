@@ -5,7 +5,7 @@
     </button>
     <div class="menu__actions" v-if="open" @click="onClickItem">
       <button class="menu-action btn" type="button">
-	<a href="https://strat.insolence.tech/"><span class="mr4">StratMap</span></a>
+        <a href="https://strat.insolence.tech/"><span class="mr4">StratMap</span></a>
       </button>
     </div>
   </div>
