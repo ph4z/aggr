@@ -381,7 +381,7 @@ export default {
         label += `${toConnect ? ' and ' : ''}disconnect${this.loading ? 'ing' : ''} ${toDisconnect}`
       }
 
-      return label ? label + ' markets' : 'REFRESH'
+      return label ? label : 'REFRESH'
     },
     searchTypes() {
       return this.$store.state.settings.searchTypes
