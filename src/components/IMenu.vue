@@ -6,7 +6,6 @@
     <div class="menu__actions" v-if="open" @click="onClickItem">
       <button class="menu-action btn" type="button">
 	<a href="https://strat.insolence.tech/"><span class="mr4">StratMap</span></a>
-        <i class="icon-enlarge"></i>
       </button>
     </div>
   </div>
